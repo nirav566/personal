@@ -1,0 +1,431 @@
+* for kernel compilation info:http: 1)//www.haifux.org/lectures/88-sil/kernel-compilation.html
+                                    2)http://www.thegeekstuff.com/2013/06/compile-linux-kernel/
+				    3)ttp://derekmolloy.ie/writing-a-linux-kernel-module-part-1-introduction/
+* IPC: http://www.tldp.org/LDP/lpg/node7.html
+* Command to revert back the commit: git reset --soft HEAD~1
+*****************************************************************************************************************
+SHARE FOLDER:
+* Command for mounting share folder: sudo mount -t vboxsf  share-folder-name-in-windows  path-of-folder-in-ububntu
+
+My shared folder/clipboard stopped to work for some reason (probably due to a patch installation on my virtual machine).
+
+-> sudo mount -t vboxsf Shared_Folder ~/SF/
+
+Gave following result:
+
+VirtualBox: mount.vboxsf: mounting failed with the error: No such device
+
+The solution for me was to stop vboxadd and do a setup after that:
+
+-> cd /opt/VBoxGuestAdditions-*/init  
+-> sudo ./vboxadd setup
+
+*****************************************************************************************************************
+when You push and it ask to pull first:
+git pull --rebase
+git push origin master
+git log --oneline
+*****************************************************************************************************************
+* Command to revert added files: git reset HEAD
+* Command to remove non-empty directory: rm -rf lampp
+* site to download all tools: http://www.freewarefiles.com/
+* To read about API: http://www.winprog.org/tutorial/start.html
+* To learn SAP http://www.guru99.com/overview-of-sap-crm.html
+
+https://svn.radixweb.in/git/axxon/oxford.git
+
+* For catalog file generation in visual studio cmd prmpt: inf2cat /driver:C:\Users\nirav.chauhan
+  n\Desktop\niravdriver\ /os:7_x64
+* DLL:https://support.microsoft.com/en-us/kb/815065
+* Reading minidump:https://support.microsoft.com/en-us/kb/315263.
+
+* err wdm :2223: Section should have an architecture decoration
+
+***************************************************************
+**To make certificate of of driver and Test sign them**
+
+1>> Inf2cat operation for making .cat(catalog) file from .inf file:
+
+inf2cat /driver:D:\PPort_v7.0.0.8_Sources\testcertificate\ /os:10_x64
+inf2cat /driver:C:\Users\nirav.chauhan\Desktop\16-6-filter-wdf /os:6_3_x64
+Inf2Cat /driver:C:\Users\nirav.chauhan\Desktop\1-8318-32--wxp /os:XP_X86
+2>> For adding in Privatestore in certification manager:
+
+makecert -r -pe -ss PrivateCertStore -n CN=OxPport OxPport.cer
+makecert -r -pe -ss Root -n CN=new2018 new2018.cer
+
+3>> Sign .cat .dll and .sys file using signtool:
+
+options: /s : for selection of store
+
+			PrivateCertStore : for "PrivateCertStore section"
+
+			Root :  for ""Trusted Root Certification Authorities""
+
+>> SignTool sign /ac OxPport.cer /s Root /n OxPport /t http://timestamp.verisign.com/scripts/timstamp.dll OxPPort.sys OxPPort.cat OxPPort.dll
+SignTool sign /ac new2018.cer /s Root /n new2018 /t http://timestamp.verisign.com/scripts/timstamp.dll OxSer.sys OxMf.sys OxMf.cat OxSer.cat OxUi.dll
+
+4>> To add certificate to Trusted Root Certification Authorities : 
+
+certmgr.exe -add OxPport.cer -s -r localMachine root
+*****************************************************************
+
+* To build driver files: http://www.codeproject.com/Articles/13090/Building-and-deploying-a-basic-WDF-Kernel-Mode-Dri
+
+*****************************************************************
+C11 ": "http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1548.pdf
+*****************************************************************
+OSR Getting Started with windows drivers: https://www.osr.com/nt-insider/2014-issue1/getting-started-writing-windows-drivers-2/
+*****************************************************************
+* Driver signing: https://msdn.microsoft.com/en-us/library/windows/hardware/ff548693%28v=vs.85%29.aspx
+
+* Trojan types: http://usa.kaspersky.com/internet-security-center/threats/trojans#.Voylxvl96Uk 
+
+* error: 0xC00000BB
+STATUS_NOT_SUPPORTED
+The request is not supported.
+
+* Link related to error above: http://forum.ultimatewindowssecurity.com/Topic78-168-1.aspx
+* Windows architecture PPT: http://www.slideshare.net/AmrithKrishna/windows-architecture
+* WEbsite blocked link: https://radixgw5.radixweb.local:4081/index.php
+* HKR: http://www.borncity.de/USBooks/Reg95tipse.htm
+
+* To log in vibe: https://radixgw5.radixweb.local:4081/login/?dest=aHR0cDovL2dvLm1pY3Jvc29mdC5jb20vZndsaW5rLz9MaW5rSUQ9MjE5NDcyJmNsY2lkPTB4NDA5&host=MTkyLjE2OC4xMDEuMTQzIGY4N2IwMTFiZWY0ODM5OTE1M2U4YzY2ZjRhZDI2MDI0
+
+* Difference between wdm and wdf:https://msdn.microsoft.com/en-us/library/windows/hardware/gg583838%28v=vs.85%29.aspx
+ 
+*  RE: Under what circumstances will enabling a device in "Device Manager" require a reboot
+you will get CM_PROB_DRIVER_FAILED_PRIOR_UNLOAD if you have oustanding 
+references on any objects (driver object, device object) after the driver has 
+been unload (e.g. DriverUnload has been called).  if these references are still 
+around when the i/o manager tries to load the driver, the driver load will fail 
+b/c the previous oustanding references will have kept the driver image in memory 
+(even though the driver has been "unloaded").
+
+what this means to you is to find out all the spots that ObReferenceObject are 
+called and make sure they all match with a call to ObDereferenceObject.
+
+
+
+**************************************************************************************************
+Callback Objects
+
+The kernel's callback mechanism provides a general way for drivers to request and provide notification when certain conditions are satisfied.
+
+A driver can create a callback object, and other drivers can request notification for conditions associated with this driver-defined callback. In addition, 
+the system defines two callback objects for driver use.
+
+Every callback object has a name and a set of attributes, defined when the object is created. The system-defined callback objects are named \Callback\SetSystemTime,
+ \Callback\PowerState, and \Callback\ProcessorAdd; driver-defined callbacks must not duplicate these names.
+
+To request notification from a system- or driver-defined callback, a driver opens the callback object and registers a callback routine. When the conditions defined
+ for the callback become true, its creator triggers notification. In turn, the system calls all the callback routines registered for the callback. 
+*************************************************************************************************************************************************
+
+
+Callout Driver:
+
+A callout driver is a kernel-mode driver that implements one or more callouts. A callout driver registers its callouts with the filter engine so that the filter
+ engine can call the callout functions for the callout when the computer processes connections or packets.
+
+Callout:
+
+A callout provides functionality that extends the capabilities of the Windows Filtering Platform. A callout consists of a set of callout functions and a GUID key
+ that uniquely identifies the callout. There are several built-in callouts that are included with the Windows Filtering Platform. Additional callouts can be added
+ by using callout drivers.
+****************************************************************************************************
+Specifying an Unload Function
+
+A callout driver must provide an unload function. The operating system calls this function when the callout driver is unloaded from the system. A callout driver's
+ unload function must guarantee that the callout driver's callouts are unregistered from the filter engine before the callout driver is unloaded from system memory.
+ A callout driver cannot be unloaded from the system if it does not provide an unload function.
+
+How a callout driver specifies an unload function depends on whether the callout driver is based on the Windows Driver Model (WDM) or the Windows Driver Frameworks
+ (WDF).
+WDM-Based Callout Drivers
+
+If a callout driver is based on WDM, it specifies an Unload function in its DriverEntry function. For example:
+
+
+VOID
+ Unload(
+    IN PDRIVER_OBJECT DriverObject
+    );
+
+NTSTATUS
+ DriverEntry(
+    IN PDRIVER_OBJECT DriverObject,
+    IN PUNICODE_STRING RegistryPath
+    )
+{
+  ...
+
+  // Specify the callout driver's Unload function
+ DriverObject->DriverUnload = Unload;
+
+  ...
+}
+
+WDF-Based Callout Drivers
+
+If a callout driver is based on WDF, it specifies an EvtDriverUnload function in its DriverEntry function. For example:
+
+
+VOID
+ Unload(
+    IN WDFDRIVER Driver
+    );
+
+NTSTATUS
+ DriverEntry(
+    IN PDRIVER_OBJECT DriverObject,
+    IN PUNICODE_STRING RegistryPath
+    )
+{
+  NTSTATUS status;
+  WDF_DRIVER_CONFIG config;
+  WDFDRIVER driver;
+
+  ...
+
+  // Initialize the driver config structure
+  WDF_DRIVER_CONFIG_INIT(&config, NULL);
+
+  // Indicate that this is a non-PNP driver
+ config.DriverInitFlags = WdfDriverInitNonPnpDriver;
+
+  // Specify the callout driver's Unload function
+ config.EvtDriverUnload = Unload;
+
+  // Create a WDFDRIVER object
+ status =
+ WdfDriverCreate(
+ DriverObject,
+ RegistryPath,
+      NULL,
+      &config,
+      &driver
+      );
+
+  ...
+
+ return status;
+}
+
+For information about how to implement a callout driver's unload function, see Unloading a Callout Driver.
+
+ 
+
+***************************************************************************************************************************
+ 
+ *** NxPagedPool:
+ https://msdn.microsoft.com/en-us/library/windows/hardware/hh920391%28v=vs.85%29.aspx
+ https://msdn.microsoft.com/en-us/library/windows/hardware/hh920394%28v=vs.85%29.aspx
+ https://msdn.microsoft.com/en-us/library/windows/hardware/hh920392%28v=vs.85%29.aspx
+ 
+*****************************************************************************************************************************
+
+***Commands for getting Motherboard information and Bios version 
+* wmic baseboard get product,Manufacturer,version,serialnumber
+* wmic bios get smbiosbiosversion
+* Utility provided by Microsoft: System Information
+
+**********************************************************************************************************************************
+
+* To download windows driver tools: https://msdn.microsoft.com/en-in/windows/hardware/dn433227.aspx
+
+* Miniport drivers: https://msdn.microsoft.com/en-us/library/windows/hardware/hh439643%28v=vs.85%29.aspx
+* Device tree: https://msdn.microsoft.com/en-us/library/windows/hardware/ff554721%28v=vs.85%29.aspx
+
+* Device Stack: The ordered list of device objects, along with their associated drivers, is called the device stack for the device node.
+* Device stack and device nodes: https://msdn.microsoft.com/en-us/library/windows/hardware/ff554721%28v=vs.85%29.aspx
+* Bus driver: The driver that creates the PDO for a device node is called the bus driver for the node.
+
+* NonPNP(Legacy devices) INF: https://msdn.microsoft.com/en-us/library/windows/hardware/ff544221%28v=vs.85%29.aspx
+* Using vs13 to build project for xp:http://www.slideshare.net/YanVugenfirer/building-old-windows-drivers-xp-vista-2003-and-2008-with-visual-studio-2013
+
+-QI0f -QIf -QIfdiv- -Zel -cbstring  
+
+* IOCTL driver test help: https://github.com/Microsoft/Windows-driver-samples/tree/master/general/ioctl/wdm
+* "\\\\.\\filename": http://forum.sysinternals.com/createfile-unable-to-open-a-handle-to-a-device_topic15464.html
+****************************************************************************************************************************************************
+To bulid drivers using DDK:
+* x86/x64 checked build Environment(VS comaand prompt is different)
+* VS comaand prompt is different will be used to convert legacy project to VS project using namke2msbuild.exe utility
+
+Steps to build in DDK:
+
+1. Open the x86/x64 build environment
+2. Type: "build" command
+build -ceFgw
+****************************************************************************************************************************************************
+server symbol path :
+.sympath srv*c:\MySymbols*https://msdl.microsoft.com/download/symbols
+****************************************************************************************************************************************************
+Test Mode and debug messages settings:
+Step 1: BCDEDIT
+TEST MODE ON:
+
+  bcdedit.exe -set loadoptions DDISABLE_INTEGRITY_CHECKS
+  bcdedit.exe -set TESTSIGNING ON
+  bcdedit.exe -set nointegritychecks ON
+  bcdedit -debug on
+
+TEST MODE OFF:  
+
+  bcdedit.exe -set loadoptions DENABLE_INTEGRITY_CHECKS
+  bcdedit.exe -set TESTSIGNING OFF
+  bcdedit.exe -set nointegritychecks OFF
+  bcdedit -debug off
+
+Step 2: Win 8.1 System Settings  
+  After above steps need to change PC settings in win8.1.
+  1. Move mouse to bottom-right corner, side bar will come, click on Settings
+  2. click on Change PC Settings
+  3. Under PC Settings, click on Update and recovery. 
+  4. Under Update and recovery, click on Recovery. Go to Advanced Startup and click on Restart now. 
+  5. Select Troubleshoot.
+  6. Select Advanced Options. 
+  7. Select Startup Settings.
+  8. Select restart.
+  9. PC will be rebooted and this screen will apear. Select “7) Disable driver signature enforcement” by pressing the number 7 key on your keyboard. 
+
+Step 3:  Registry Setting
+  "HKLM\SYSTEM\CCS\Control\Session Manager\Debug Print Filter->Default=ffffffff".
+****************************************************************************************************************************************************
+* To turn machine to ready state: https://msdn.microsoft.com/en-us/library/windows/hardware/dn942347%28v=vs.85%29.aspx
+* TO solve pnp rebalance test fail restart device test failure: https://msdn.microsoft.com/en-us/windows/hardware/commercialize/test/hck/df---non-test---install-edt-test-filter-driver--optional--08435437-e38a-432b-8cf3-656780898bda
+
+******************************************************************************
+* Online circuit design: https://easyeda.com/
+**********************************************************************************
+* POrt monitor: https://msdn.microsoft.com/en-us/library/windows/hardware/ff559895%28v=vs.85%29.aspx
+https://msdn.microsoft.com/en-us/library/windows/hardware/ff563806%28v=vs.85%29.aspx
+* XPSDRV sample ppt:http://megaslides.com/doc/3348686/developing-xpsdrv-print-drivers
+* VIdeo XPSDRV: https://channel9.msdn.com/Events/Build/2015/2-94
+* WRiting printer driver: https://www.haiku-os.org/documents/dev/how_to_write_a_printer_driver
+* Adding local port: http://stackoverflow.com/questions/14885510/printer-port-setting,
+                     http://www.codeproject.com/Tips/92982/Adding-a-Local-Port-through-XcvData-and-C
+					solved batch script: https://social.technet.microsoft.com/Forums/windows/en-US/594fe12a-d6d1-4317-b9a7-9fbc98bf82ae/add-printer-port-programatically?forum=itprovistaprinting
+SCRIPT:					
+**************************
+set Port="PORT NAME WITHOUT QUOTES"
+
+#Stop the spooler first.
+
+@net stop spooler
+
+# This registry key holds local ports.  This line adds a subkey with the port name.
+
+@reg ADD "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Ports" /v %Port% /t REG_SZ /f
+
+# XP needs a configuration file of some sort that resides in System32.  In Vista the config file is saved
+
+# locally to each user but is initially copied from System32.  Either way, you need to create an empty
+
+# file in System32 for the port to initialize properly.
+
+@type nul > C:\Windows\System32\%Port%
+
+# Make the file writable to all users (needed in XP, may not be needed in vista since it's copied to local
+
+# user directory.
+
+@echo Y | cacls C:\Windows\System32\%Port% /E /G Everyone:W
+
+#Restart the spooler.
+
+@net start spooler
+*****************************************************************************************************************************************************
+* Adding Printer: http://www.cplusplus.com/forum/windows/105210/
+					http://www.codeproject.com/search.aspx?q=Addprinter
+* Adding Printer driver: http://stackoverflow.com/questions/7771413/how-to-properly-install-virtual-printer-using-winapi-on-win-x64					
+*******************************************************************************************************************
+* LiFi: http://www.slideshare.net/tanshu9871/ppt-on-lifi-technology
+*******************************************************************************************************************
+Inquiry: SNMP UPS search for winapis to implement for windows.
+* Network layers and terms: https://www.digitalocean.com/community/tutorials/an-introduction-to-networking-terminology-interfaces-and-protocols#NetworkLayers
+* UPS tools: http://networkupstools.org/docs/man/snmp-ups.html
+* https://radixgw5.radixweb.local/
+
+* Property Pages add: https://msdn.microsoft.com/en-us/library/ms676867%28v=vs.85%29.aspx
+* driver installation using NSIS: http://stackoverflow.com/questions/37566915/installing-a-driver-via-pnputil
+* File to look for windows logs: setupapi.dev.log
+* https://www.quora.com/How-do-I-crack-WiFi-password-using-Kali-Linux/answer/Prince-Verma-16
+* KERNEL_DATA_INPAGE_ERROR: https://msdn.microsoft.com/en-us/library/windows/hardware/ff559211%28v=vs.85%29.aspx
+https://msdn.microsoft.com/en-in/library/windows/hardware/ff547012%28v=vs.85%29.aspx
+https://msdn.microsoft.com/en-us/windows/hardware/drivers/wdf/introduction-to-hardware-resources
+* our drivers: http://www.softio.com/downloadsection.htm
+
+*********look*****************
+* https://msdn.microsoft.com/en-us/windows/hardware/drivers/pci/accessing-pci-device-configuration-space
+* https://msdn.microsoft.com/en-us/library/windows/hardware/ff551687%28v=vs.85%29.aspx
+* https://msdn.microsoft.com/en-us/library/windows/hardware/ff551727%28v=vs.85%29.aspx
+https://msdn.microsoft.com/en-us/library/windows/hardware/ff537624%28v=vs.85%29.aspx
+* http://stackoverflow.com/questions/36311149/accessing-the-pci-config-space-with-win32-api
+* searched:config space pci child device windows
+
+* Windows internals
+
+*****************************************************************************************************************************************************
+WDM Concepts for WDF Drivers
+Last Updated: 1/24/2017
+
+Windows Driver Frameworks (WDF) is a wrapper around Microsoft Windows Driver Model (WDM) interfaces. Although the framework simplifies many WDM concepts and hides others completely so that you do not have to work with them, you should still understand some of the basic concepts of WDM drivers. Specifically, you should understand driver types, driver stacks, device stacks, and I/O request packets.
+Driver types
+
+Windows-based drivers are divided into three types: bus drivers, function drivers, and filter drivers. Bus drivers support I/O buses by detecting child devices that are plugged into a parent bus and reporting their characteristics. (This activity is called bus enumeration.) Function drivers control I/O operations for devices and buses. Filter drivers receive, review, and possibly modify data that flows between user applications and drivers, or between individual drivers.
+
+Drivers for buses are essentially function drivers that also enumerate children. A driver acts as a "bus driver" when it enumerates the child devices on a bus. Otherwise, the same driver acts as the "function driver" for the bus when it handles I/O operations that access the bus adapter's hardware.
+
+A User-Mode Driver Framework (UMDF) driver cannot be a bus driver.
+Driver stacks
+
+In the Windows operating system, WDM drivers are layered in a vertical calling sequence that is called a driver stack. The topmost driver in the stack typically receives I/O requests from user applications, after the requests have passed through the operating system's I/O manager. The lower driver layers typically communicate with computer hardware.
+
+A simple driver stack includes a bus driver at the bottom of the stack, which handles bus-specific I/O operations and enumerates the child devices that are connected to it. Typically, one or more device-specific function drivers are above the bus driver. These function drivers handle I/O operations to the devices that are connected to the bus. Filter drivers can be above the function drivers, or they can reside between a bus driver and function driver. A running system has several driver stacks that support different types of devices.
+Device stacks
+
+Each driver stack supports one or more device stacks. A device stack is a set of device objects that are created from WDM-defined DEVICE_OBJECT structures. Each device stack represents one device. Each driver creates a device object for each of its devices and attaches each device object to a device stack. Device stacks are created and removed as devices are plugged in and unplugged, and each time the system is rebooted.
+
+When a bus driver detects that child devices have been plugged in or unplugged, it informs the Plug and Play (PnP) manager. In response, the PnP manager asks the bus driver to create a physical device object (PDO) for each child device that is connected to the parent device (that is, the bus). The PDO becomes the bottom of a device stack.
+
+Next, the PnP manager loads function and filter drivers to support each device (if they are not already loaded), and then the PnP manager calls these drivers so that each can create a device object and add it to the top of the device stack. Function drivers create functional device objects (FDOs), and filter drivers create filter device objects (filter DOs).
+
+When the I/O manager sends an I/O request to a device's drivers, it passes the request to the driver that created the topmost device object in the device stack. If that driver asks the I/O manager to pass the request to the next-lower driver, the I/O manager uses the device stack to determine the next-lower driver. (The next-lower driver is the driver that created the next-lower device object.)
+
+WDF creates a framework device object for each WDM device object. Framework-based drivers access these framework device objects instead of WDM device objects.
+I/O request packets
+
+The I/O manager sends an application's I/O requests to drivers by creating I/O request packets (IRPs). An IRP can contain a request to perform an I/O operation (such as a read/write operation) or a request to perform an I/O control (IOCTL) action (such as returning status). In addition, the PnP manager creates IRPs that represent PnP and power management operations that drivers must perform, and it sends these IRPs to drivers.
+
+Typically, the I/O manager creates a read or write IRP when a user application requests a read or write operation. The I/O manager passes the IRP to the driver at the top of the driver stack, and that driver either services the request or passes the request to the next-lower driver. Some requests travel to the bottom of the stack, and some are completely processed by higher-level drivers.
+
+Each time a driver receives an IRP, the driver also receives a pointer to the device object that represents the device that must handle the operation. Therefore, the drivers in a driver stack use device objects to determine which of their plugged-in devices a particular request is supposed to go to.
+
+WDF drivers typically do not directly access IRPs. The framework converts the WDM IRPs that represent read, write, and device I/O control operations to framework request objects that Kernel-Mode Driver Framework (KMDF) and UMDF drivers receive in I/O queues. The framework handles PnP and power management IRPs internally and uses event callback functions to inform the driver of PnP and power events.
+
+*****************************************************************************************************************************************************
+Driver-Driver and Driver-Application Communication:https://blogs.msdn.microsoft.com/iliast/2007/10/06/driver-driver-and-driver-application-communication/
+* OSR Tutorial windows drivers: https://www.osr.com/nt-insider/2014-issue1/getting-started-writing-windows-drivers-2/
+
+
+Page Size:
+"It depends on which processor".
+
+Itanium uses 8KB pages.
+
+X86-32 and x86-64 uses 4KB, 2MB and 1GB pages as appropriate [note that for 2MB and 1GB pages to work, the memory needs to be a multiple of 2MB/1GB in size and be aligned to 2MB/1GB respectively].
+
+Other processors, such as ARM (currently only 32-bit OS), typically uses 4KB pages, but can also use 64KB pages.
+
+If you can find an old DEC Alpha processor, and operating system to match, that would also use 8KB pages. 
+
+*****************************************************************************************************************************************************
+Enable debug messages registry settings:
+"HKLM\SYSTEM\CCS\Control\Session Manager\Debug Print Filter"=> Default:0xffff
+*****************************************************************************************************************************************************
+To set include path linux: export CPLUS_INCLUDE_PATH="/home/radix/OpenCv/build/include"
+To print include path linux: echo $CPLUS_INCLUDE_PATH
+*****************************************************************************************************************************************************
+Initializer list C++ : https://www.geeksforgeeks.org/when-do-we-use-initializer-list-in-c/
